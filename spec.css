@@ -264,3 +264,11 @@ pre > code {
   color: rgb(229, 0, 0);
   background-color: transparent;
 }
+
+td.char {
+  text-align: center;
+}
+
+td.value {
+  text-align: right;
+}

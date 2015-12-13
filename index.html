@@ -35,7 +35,10 @@ parsing algorithm.
 <!--begin-toc-->
 <ol class=toc>
  <li><a href=#terminology><span class=secno>1 </span>Terminology</a></li>
- <li><a href=#parsing-a-cjk-number><span class=secno>2 </span>Parsing a CJK number</a></li>
+ <li><a href=#cjk-numbers><span class=secno>2 </span>CJK numbers</a>
+  <ol>
+   <li><a href=#digits><span class=secno>2.1 </span>Digits</a></li>
+   <li><a href=#parsing-cjk-numbers><span class=secno>2.2 </span>Parsing CJK numbers</a></li></ol></li>
  <li><a class=no-num href=#tests-and-implementation>Tests and implementation</a></li>
  <li><a class=no-num href=#author>Author</a></li></ol>
 <!--end-toc-->
@@ -69,16 +72,794 @@ intended to be performant.)
 </p></section>
 
 <section>
-<h1 id=parsing-a-cjk-number><span class=secno>2 </span>Parsing a CJK number</h1>
+<h1 id=cjk-numbers><span class=secno>2 </span>CJK numbers</h1>
 
-<p>To <dfn id=parse-a-cjk-number>parse a CJK number</dfn> (<span lang=ja>漢数字</span>), the
+<p>This section defines an algorithm to parse CJK numbers
+(<span lang=ja>漢数字</span>).
+
+</p><section>
+<h1 id=digits><span class=secno>2.1 </span>Digits</h1>
+
+<p>Digits used in CJK numbers are defined by the following table.
+Each character in the table has its <dfn id=value>value</dfn> shown in
+the <i>value</i> column of the same row and belongs to the category
+shown in the <i>category</i> column of the same row.
+
+</p><div class=note>
+  <p>The <a href=#value>value</a> of a character is a non-negative integer.
+</p></div>
+
+<p>There are following categories: <dfn id=cjk-digit>CJK digit</dfn>,
+<dfn id=cjk-ten>CJK ten</dfn>, <dfn id=cjk-multiple-tens>CJK multiple tens</dfn>,
+<dfn id=cjk-hundred>CJK hundred</dfn>, <dfn id=cjk-thousand>CJK thousand</dfn>,
+<dfn id=cjk-ten-thousand>CJK ten thousand</dfn>, <dfn id=cjk-hundred-million>CJK hundred million</dfn>,
+<dfn id=cjk-trillion>CJK trillion</dfn>, and <dfn id=cjk-ten-quadrillion>CJK ten quadrillion</dfn>.
+
+</p><table>
+  <thead>
+    <tr>
+      <th colspan=3>Character
+      </th><th rowspan=2>Value
+      </th><th rowspan=2>Category
+    </th></tr><tr>
+      <th>Code point
+      </th><th>Name
+      </th><th>Character
+  </th></tr></thead><tbody>
+    
+    <tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0030</code>
+      </th><td><code class=charname>DIGIT ZERO</code>
+      </td><td class=char><data>0</data>
+      </td><td class=value><data itemprop=value>0</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0031</code>
+      </th><td><code class=charname>DIGIT ONE</code>
+      </td><td class=char><data>1</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0032</code>
+      </th><td><code class=charname>DIGIT TWO</code>
+      </td><td class=char><data>2</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0033</code>
+      </th><td><code class=charname>DIGIT THREE</code>
+      </td><td class=char><data>3</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0034</code>
+      </th><td><code class=charname>DIGIT FOUR</code>
+      </td><td class=char><data>4</data>
+      </td><td class=value><data itemprop=value>4</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0035</code>
+      </th><td><code class=charname>DIGIT FIVE</code>
+      </td><td class=char><data>5</data>
+      </td><td class=value><data itemprop=value>5</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0036</code>
+      </th><td><code class=charname>DIGIT SIX</code>
+      </td><td class=char><data>6</data>
+      </td><td class=value><data itemprop=value>6</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0037</code>
+      </th><td><code class=charname>DIGIT SEVEN</code>
+      </td><td class=char><data>7</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0038</code>
+      </th><td><code class=charname>DIGIT EIGHT</code>
+      </td><td class=char><data>8</data>
+      </td><td class=value><data itemprop=value>8</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+0039</code>
+      </th><td><code class=charname>DIGIT NINE</code>
+      </td><td class=char><data>9</data>
+      </td><td class=value><data itemprop=value>9</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+3007</code>
+      </th><td><code class=charname>IDEOGRAPHIC NUMBER ZERO</code>
+      </td><td class=char><data>〇</data>
+      </td><td class=value><data itemprop=value>0</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E00</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E00</code>
+      </td><td class=char><data>一</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E03</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E03</code>
+      </td><td class=char><data>七</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E07</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E07</code>
+      </td><td class=char><data>万</data>
+      </td><td class=value><data itemprop=value>10000</data>
+      </td><td><a href=#cjk-ten-thousand itemprop=category>CJK ten thousand</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E09</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E09</code>
+      </td><td class=char><data>三</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E17</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E17</code>
+      </td><td class=char><data>丗</data>
+      </td><td class=value><data itemprop=value>30</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E5D</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E5D</code>
+      </td><td class=char><data>九</data>
+      </td><td class=value><data itemprop=value>9</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E8C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E8C</code>
+      </td><td class=char><data>二</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E94</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E94</code>
+      </td><td class=char><data>五</data>
+      </td><td class=value><data itemprop=value>5</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4E96</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4E96</code>
+      </td><td class=char><data>亖</data>
+      </td><td class=value><data itemprop=value>4</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4EAC</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4EAC</code>
+      </td><td class=char><data>京</data>
+      </td><td class=value><data itemprop=value>10000000000000000</data>
+      </td><td><a href=#cjk-ten-quadrillion itemprop=category>CJK ten quadrillion</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4EDF</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4EDF</code>
+      </td><td class=char><data>仟</data>
+      </td><td class=value><data itemprop=value>1000</data>
+      </td><td><a href=#cjk-thousand itemprop=category>CJK thousand</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4F0D</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4F0D</code>
+      </td><td class=char><data>伍</data>
+      </td><td class=value><data itemprop=value>5</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+4F70</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-4F70</code>
+      </td><td class=char><data>佰</data>
+      </td><td class=value><data itemprop=value>100</data>
+      </td><td><a href=#cjk-hundred itemprop=category>CJK hundred</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5104</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5104</code>
+      </td><td class=char><data>億</data>
+      </td><td class=value><data itemprop=value>100000000</data>
+      </td><td><a href=#cjk-hundred-million itemprop=category>CJK hundred million</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5146</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5146</code>
+      </td><td class=char><data>兆</data>
+      </td><td class=value><data itemprop=value>1000000000000</data>
+      </td><td><a href=#cjk-trillion itemprop=category>CJK trillion</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+516B</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-516B</code>
+      </td><td class=char><data>八</data>
+      </td><td class=value><data itemprop=value>8</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+516D</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-516D</code>
+      </td><td class=char><data>六</data>
+      </td><td class=value><data itemprop=value>6</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5341</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5341</code>
+      </td><td class=char><data>十</data>
+      </td><td class=value><data itemprop=value>10</data>
+      </td><td><a href=#cjk-ten itemprop=category>CJK ten</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5343</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5343</code>
+      </td><td class=char><data>千</data>
+      </td><td class=value><data itemprop=value>1000</data>
+      </td><td><a href=#cjk-thousand itemprop=category>CJK thousand</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5344</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5344</code>
+      </td><td class=char><data>卄</data>
+      </td><td class=value><data itemprop=value>20</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5345</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5345</code>
+      </td><td class=char><data>卅</data>
+      </td><td class=value><data itemprop=value>30</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+534C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-534C</code>
+      </td><td class=char><data>卌</data>
+      </td><td class=value><data itemprop=value>40</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+53C1</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-53C1</code>
+      </td><td class=char><data>叁</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+53C2</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-53C2</code>
+      </td><td class=char><data>参</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+53C3</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-53C3</code>
+      </td><td class=char><data>參</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+53C4</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-53C4</code>
+      </td><td class=char><data>叄</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+56DB</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-56DB</code>
+      </td><td class=char><data>四</data>
+      </td><td class=value><data itemprop=value>4</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+58F1</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-58F1</code>
+      </td><td class=char><data>壱</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+58F9</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-58F9</code>
+      </td><td class=char><data>壹</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5EFF</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5EFF</code>
+      </td><td class=char><data>廿</data>
+      </td><td class=value><data itemprop=value>20</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5F0C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5F0C</code>
+      </td><td class=char><data>弌</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5F0D</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5F0D</code>
+      </td><td class=char><data>弍</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5F0E</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5F0E</code>
+      </td><td class=char><data>弎</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5F10</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5F10</code>
+      </td><td class=char><data>弐</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+62FE</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-62FE</code>
+      </td><td class=char><data>拾</data>
+      </td><td class=value><data itemprop=value>10</data>
+      </td><td><a href=#cjk-ten itemprop=category>CJK ten</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+634C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-634C</code>
+      </td><td class=char><data>捌</data>
+      </td><td class=value><data itemprop=value>8</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+67D2</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-67D2</code>
+      </td><td class=char><data>柒</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+6F06</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-6F06</code>
+      </td><td class=char><data>漆</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+7396</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-7396</code>
+      </td><td class=char><data>玖</data>
+      </td><td class=value><data itemprop=value>9</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+767E</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-767E</code>
+      </td><td class=char><data>百</data>
+      </td><td class=value><data itemprop=value>100</data>
+      </td><td><a href=#cjk-hundred itemprop=category>CJK hundred</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+8086</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-8086</code>
+      </td><td class=char><data>肆</data>
+      </td><td class=value><data itemprop=value>4</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+842C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-842C</code>
+      </td><td class=char><data>萬</data>
+      </td><td class=value><data itemprop=value>10000</data>
+      </td><td><a href=#cjk-ten-thousand itemprop=category>CJK ten thousand</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+8CAE</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-8CAE</code>
+      </td><td class=char><data>貮</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+8CB3</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-8CB3</code>
+      </td><td class=char><data>貳</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+8CEA</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-8CEA</code>
+      </td><td class=char><data>質</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+8D30</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-8D30</code>
+      </td><td class=char><data>贰</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+9621</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-9621</code>
+      </td><td class=char><data>阡</data>
+      </td><td class=value><data itemprop=value>1000</data>
+      </td><td><a href=#cjk-thousand itemprop=category>CJK thousand</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+9646</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-9646</code>
+      </td><td class=char><data>陆</data>
+      </td><td class=value><data itemprop=value>6</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+964C</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-964C</code>
+      </td><td class=char><data>陌</data>
+      </td><td class=value><data itemprop=value>100</data>
+      </td><td><a href=#cjk-hundred itemprop=category>CJK hundred</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+9678</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-9678</code>
+      </td><td class=char><data>陸</data>
+      </td><td class=value><data itemprop=value>6</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+96F6</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-96F6</code>
+      </td><td class=char><data>零</data>
+      </td><td class=value><data itemprop=value>0</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF10</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT ZERO</code>
+      </td><td class=char><data>０</data>
+      </td><td class=value><data itemprop=value>0</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF11</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT ONE</code>
+      </td><td class=char><data>１</data>
+      </td><td class=value><data itemprop=value>1</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF12</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT TWO</code>
+      </td><td class=char><data>２</data>
+      </td><td class=value><data itemprop=value>2</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF13</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT THREE</code>
+      </td><td class=char><data>３</data>
+      </td><td class=value><data itemprop=value>3</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF14</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT FOUR</code>
+      </td><td class=char><data>４</data>
+      </td><td class=value><data itemprop=value>4</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF15</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT FIVE</code>
+      </td><td class=char><data>５</data>
+      </td><td class=value><data itemprop=value>5</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF16</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT SIX</code>
+      </td><td class=char><data>６</data>
+      </td><td class=value><data itemprop=value>6</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF17</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT SEVEN</code>
+      </td><td class=char><data>７</data>
+      </td><td class=value><data itemprop=value>7</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF18</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT EIGHT</code>
+      </td><td class=char><data>８</data>
+      </td><td class=value><data itemprop=value>8</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+FF19</code>
+      </th><td><code class=charname>FULLWIDTH DIGIT NINE</code>
+      </td><td class=char><data>９</data>
+      </td><td class=value><data itemprop=value>9</data>
+      </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
+  
+</td></tr></tbody></table>
+
+</section>
+
+<section>
+<h1 id=parsing-cjk-numbers><span class=secno>2.2 </span>Parsing CJK numbers</h1>
+
+<p>To <dfn id=parse-a-cjk-number>parse a CJK number</dfn> <var>string</var>, the
 implementation <em class=rfc2119>MUST</em> run the following steps:
 
 </p><ol class=steps>
 
-<li class=XXX>XXX
+<li>Let <var>input</var> be a copy of <var>string</var>.
+
+</li><li>If <var>input</var> is the empty string, return null and abort
+these steps.
+
+</li><li>Set <var>value</var> to the result of applying the <a href=#rules-for-parsing-a-large-cjk-number>rules for
+parsing a large CJK number</a>.
+
+</li><li>If <var>input</var> is not the empty string, return null and abort
+these steps.
+
+</li><li>Return <var>value</var><!-- which can be null -->.
 
 </li></ol>
+
+<p>These steps returns either a number or null.  The null value
+represents an error.
+
+
+</p><p>The <dfn id=rules-for-parsing-a-large-cjk-number>rules for parsing a large CJK number</dfn> are as given in
+the following steps, which share the same <var>input</var> with the
+steps that invoke these steps:
+
+</p><ol class=steps>
+
+<li>Let <var>value</var> be zero.
+
+
+</li><li>If <var>input</var> starts with five or more <a href=#cjk-digit title="CJK
+digit">CJK digits</a>, remove them from <var>input</var> and run
+these substeps:
+
+  <ol>
+
+  <li>Let <var>digits</var> be those characters.
+
+  </li><li>Replace each character in <var>digits</var> by
+  the <a href=https://html.spec.whatwg.org/#ascii-digits>ASCII
+  digit</a> representing its <a href=#value>value</a>.
+
+  </li><li>Set <var>v</var> to the value obtained by
+  interpreting <var>digits</var> as a decimal number.
+
+  </li></ol>
+
+</li><li>Otherwise, let <var>v</var> be the result of applying
+the <a href=#rules-for-parsing-a-small-cjk-number>rules for parsing a small CJK number</a>.
+
+</li><li>If <var>v</var> is null, return null and abort these steps.
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-ten-quadrillion>CJK ten
+quadrillion</a>, remove it from <var>input</var> and run these
+substeps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-trillion>CJK trillion</a>,
+remove it from <var>input</var> and run these substeps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-hundred-million>CJK hundred
+million</a>, remove it from <var>input</var> and run these
+substeps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-ten-thousand>CJK ten thousand</a>,
+remove it from <var>input</var> and run these substeps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+
+</li><li>Add <var>v</var> to <var>value</var>.
+
+</li><li>Return <var>value</var>.
+
+</li></ol>
+
+<p>The <dfn id=rules-for-parsing-a-small-cjk-number>rules for parsing a small CJK number</dfn> are as given in
+the following steps, which share the same <var>input</var> with the
+steps that invoke these steps:
+
+</p><ol class=steps>
+
+<li>If <var>input</var> starts with two, three, or
+four <a href=#cjk-digit title="CJK digit">CJK digits</a>, remove them
+from <var>input</var> and run these substeps:
+
+  <ol>
+
+  <li>Let <var>digits</var> be those characters.
+
+  </li><li>Replace each character in <var>digits</var> by
+  the <a href=https://html.spec.whatwg.org/#ascii-digits>ASCII
+  digit</a> representing its <a href=#value>value</a>.
+
+  </li><li>Return the value obtained by interpreting <var>digits</var> as a
+  decimal number and abort the entire steps.
+
+  </li></ol>
+
+</li><li>Let <var>value</var> be zero.
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a> followed
+by a <a href=#cjk-thousand>CJK thousand</a>, remove them from <var>input</var> and
+run these substeps:
+
+  <ol>
+
+  <li>Let <var>n</var> be the <a href=#value>value</a> of the <a href=#cjk-digit>CJK
+  digit</a>.
+
+  </li><li>Let <var>m</var> be the <a href=#value>value</a> of the <a href=#cjk-thousand>CJK
+  thousand</a>.
+
+  </li><li>Add <var>n</var> × <var>m</var> to <var>value</var>.
+
+  </li></ol>
+
+</li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-thousand>CJK
+thousand</a>, remove it from <var>input</var> and add
+the <a href=#value>value</a> of it to <var>value</var>.
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a> followed
+by a <a href=#cjk-hundred>CJK hundred</a>, remove them from <var>input</var> and
+run these substeps:
+
+  <ol>
+
+  <li>Let <var>n</var> be the <a href=#value>value</a> of the <a href=#cjk-digit>CJK
+  digit</a>.
+
+  </li><li>Let <var>m</var> be the <a href=#value>value</a> of the <a href=#cjk-hundred>CJK
+  hundred</a>.
+
+  </li><li>Add <var>n</var> × <var>m</var> to <var>value</var>.
+
+  </li></ol>
+
+</li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-hundred>CJK
+hundred</a>, remove it from <var>input</var> and add
+the <a href=#value>value</a> of it to <var>value</var>.
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a> followed
+by a <a href=#cjk-ten>CJK ten</a>, remove them from <var>input</var> and run
+these substeps:
+
+  <ol>
+
+  <li>Let <var>n</var> be the <a href=#value>value</a> of the <a href=#cjk-digit>CJK
+  digit</a>.
+
+  </li><li>Let <var>m</var> be the <a href=#value>value</a> of the <a href=#cjk-ten>CJK
+  ten</a>.
+
+  </li><li>Add <var>n</var> × <var>m</var> to <var>value</var>.
+
+  </li></ol>
+
+</li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-ten>CJK ten</a>,
+remove it from <var>input</var> and add the <a href=#value>value</a> of it
+to <var>value</var>.
+
+</li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-multiple-tens>CJK multiple
+tens</a>, remove it from <var>input</var> and add
+the <a href=#value>value</a> of it to <var>value</var>.
+
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a>, remove
+it from <var>input</var> and add the <a href=#value>value</a> of it
+to <var>value</var>.
+
+
+</li><li>If no character is removed by these steps, return null and abort
+these steps.
+
+</li><li>Return <var>value</var>.
+
+</li></ol>
+
+</section>
 
 </section>
 
