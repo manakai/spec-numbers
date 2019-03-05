@@ -5,7 +5,7 @@
 </head><body><header>
 <hgroup>
 <h1 class="no-toc no-num">Numbers</h1>
-<h2 class="no-toc no-num">The manakai project, 14 December 2015</h2>
+<h2 class="no-toc no-num">The manakai project, 5 March 2019</h2>
 
 
 <dl>
@@ -89,11 +89,12 @@ shown in the <i>category</i> column of the same row.
   <p>The <a href=#value>value</a> of a character is a non-negative integer.
 </p></div>
 
-<p>There are following categories: <dfn id=cjk-digit>CJK digit</dfn>,
-<dfn id=cjk-ten>CJK ten</dfn>, <dfn id=cjk-multiple-tens>CJK multiple tens</dfn>,
-<dfn id=cjk-hundred>CJK hundred</dfn>, <dfn id=cjk-thousand>CJK thousand</dfn>,
-<dfn id=cjk-ten-thousand>CJK ten thousand</dfn>, <dfn id=cjk-hundred-million>CJK hundred million</dfn>,
-<dfn id=cjk-trillion>CJK trillion</dfn>, and <dfn id=cjk-ten-quadrillion>CJK ten quadrillion</dfn>.
+<p>There are following categories: <dfn id=cjk-digit>CJK digit</dfn>, <dfn id=cjk-ten>CJK
+ten</dfn>, <dfn id=cjk-multiple-tens>CJK multiple tens</dfn>, <dfn id=cjk-hundred>CJK
+hundred</dfn>, <dfn id=cjk-multiple-hundreds>CJK multiple hundreds</dfn>, <dfn id=cjk-thousand>CJK
+thousand</dfn>, <dfn id=cjk-ten-thousand>CJK ten thousand</dfn>, <dfn id=cjk-hundred-million>CJK hundred
+million</dfn>, <dfn id=cjk-trillion>CJK trillion</dfn>, and <dfn id=cjk-ten-quadrillion>CJK ten
+quadrillion</dfn>.
 
 </p><table>
   <thead>
@@ -388,6 +389,13 @@ shown in the <i>category</i> column of the same row.
       </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>
   
     </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5EFE</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5EFE</code>
+      </td><td class=char><data>廾</data>
+      </td><td class=value><data itemprop=value>20</data>
+      </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
       <th><code itemprop=codepoint>U+5EFF</code>
       </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5EFF</code>
       </td><td class=char><data>廿</data>
@@ -463,6 +471,13 @@ shown in the <i>category</i> column of the same row.
       </td><td class=char><data>百</data>
       </td><td class=value><data itemprop=value>100</data>
       </td><td><a href=#cjk-hundred itemprop=category>CJK hundred</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+7695</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-7695</code>
+      </td><td class=char><data>皕</data>
+      </td><td class=value><data itemprop=value>200</data>
+      </td><td><a href=#cjk-multiple-hundreds itemprop=category>CJK multiple hundreds</a>
   
     </td></tr><tr itemscope="" itemtype=cjk-numeral>
       <th><code itemprop=codepoint>U+8086</code>
@@ -802,8 +817,8 @@ the <a href=#value>value</a> of it to <var>value</var>.
 
 
 </li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a> followed
-by a <a href=#cjk-hundred>CJK hundred</a>, remove them from <var>input</var> and
-run these substeps:
+by a <a href=#cjk-hundred>CJK hundred</a> or <span>CJK multiple hundreds,
+remove them from <var>input</var> and run these substeps:
 
   <ol>
 
@@ -817,9 +832,10 @@ run these substeps:
 
   </li></ol>
 
-</li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-hundred>CJK
-hundred</a>, remove it from <var>input</var> and add
-the <a href=#value>value</a> of it to <var>value</var>.
+</span></li><li>Otherwise, if <var>input</var> starts with a <a href=#cjk-hundred>CJK
+hundred</a> or <a href=#cjk-multiple-hundreds>CJK multiple hundreds</a>, remove it
+from <var>input</var> and add the <a href=#value>value</a> of it
+to <var>value</var>.
 
 
 </li><li>If <var>input</var> starts with a <a href=#cjk-digit>CJK digit</a> followed
@@ -886,7 +902,7 @@ implementation: <a href=https://github.com/wakaba/perl-number-cjk>perl-number-cj
 <h1 class=no-num id=author>Author</h1>
 
 <p>This document is written
-by <a href=http://suika.suikawiki.org/~wakaba/who?>Wakaba</a>
+by <a href=https://suika.suikawiki.org/~wakaba/who?>Wakaba</a>
 &lt;wakaba@suikawiki.org&gt;.
 
 </p><p>This document is developed as part of

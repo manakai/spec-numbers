@@ -81,11 +81,12 @@ shown in the <i>category</i> column of the same row.
   <p>The <span>value</span> of a character is a non-negative integer.
 </div>
 
-<p>There are following categories: <dfn>CJK digit</dfn>,
-<dfn>CJK ten</dfn>, <dfn>CJK multiple tens</dfn>,
-<dfn>CJK hundred</dfn>, <dfn>CJK thousand</dfn>,
-<dfn>CJK ten thousand</dfn>, <dfn>CJK hundred million</dfn>,
-<dfn>CJK trillion</dfn>, and <dfn>CJK ten quadrillion</dfn>.
+<p>There are following categories: <dfn>CJK digit</dfn>, <dfn>CJK
+ten</dfn>, <dfn>CJK multiple tens</dfn>, <dfn>CJK
+hundred</dfn>, <dfn>CJK multiple hundreds</dfn>, <dfn>CJK
+thousand</dfn>, <dfn>CJK ten thousand</dfn>, <dfn>CJK hundred
+million</dfn>, <dfn>CJK trillion</dfn>, and <dfn>CJK ten
+quadrillion</dfn>.
 
 <table>
   <thead>
@@ -290,8 +291,8 @@ the <span>value</span> of it to <var>value</var>.
 
 
 <li>If <var>input</var> starts with a <span>CJK digit</span> followed
-by a <span>CJK hundred</span>, remove them from <var>input</var> and
-run these substeps:
+by a <span>CJK hundred</span> or <span>CJK multiple hundreds</dfn>,
+remove them from <var>input</var> and run these substeps:
 
   <ol>
 
@@ -306,8 +307,9 @@ run these substeps:
   </ol>
 
 <li>Otherwise, if <var>input</var> starts with a <span>CJK
-hundred</span>, remove it from <var>input</var> and add
-the <span>value</span> of it to <var>value</var>.
+hundred</span> or <span>CJK multiple hundreds</span>, remove it
+from <var>input</var> and add the <span>value</span> of it
+to <var>value</var>.
 
 
 <li>If <var>input</var> starts with a <span>CJK digit</span> followed
@@ -374,7 +376,7 @@ implementation: <a href="https://github.com/wakaba/perl-number-cjk">perl-number-
 <h1 class=no-num>Author</h1>
 
 <p>This document is written
-by <a href="http://suika.suikawiki.org/~wakaba/who?">Wakaba</a>
+by <a href="https://suika.suikawiki.org/~wakaba/who?">Wakaba</a>
 &lt;wakaba@suikawiki.org>.
 
 <p>This document is developed as part of

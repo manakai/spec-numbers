@@ -46,7 +46,7 @@ for (qw(9 ９ 九 玖)) {
   $DigitValue->{$_} = 9;
   $Category->{$_} = 'CJK digit';
 }
-for (qw(廿 卄)) {
+for (qw(廿 卄 廾)) {
   $DigitValue->{$_} = 20;
   $Category->{$_} = 'CJK multiple tens';
 }
@@ -65,6 +65,10 @@ for (qw(十 拾)) {
 for (qw(百 陌 佰)) {
   $DigitValue->{$_} = 100;
   $Category->{$_} = 'CJK hundred';
+}
+for (qw(皕)) {
+  $DigitValue->{$_} = 200;
+  $Category->{$_} = 'CJK multiple hundreds';
 }
 for (qw(千 阡 仟)) {
   $DigitValue->{$_} = 1000;
