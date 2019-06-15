@@ -88,7 +88,7 @@ for (qw(万 萬)) {
   $DigitValue->{$_} = 10000;
   push @{$Categories->{$_}}, 'CJK ten thousand';
 }
-for (qw(億)) {
+for (qw(億 亿)) {
   $DigitValue->{$_} = 1_0000_0000;
   push @{$Categories->{$_}}, 'CJK hundred million';
 }
