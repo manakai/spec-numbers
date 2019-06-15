@@ -72,28 +72,42 @@ intended to be performant.)
 <section>
 <h1>Digits</h1>
 
-<p>Digits used in CJK numbers are defined by the following table.
-Each character in the table has its <dfn>value</dfn> shown in
-the <i>value</i> column of the same row and belongs to the category
-shown in the <i>category</i> column of the same row.
+<p>Digits and other characters used in CJK numbers are defined by the
+following table.  Each character in the table has its <dfn>value</dfn>
+shown in the <i>value</i> column of the same row and belongs to the
+categories shown in the <i>categories</i> column of the same row.  If
+the <i>value</i> column's content is "-", the character has
+no <span>value</span>.
 
 <div class=note>
   <p>The <span>value</span> of a character is a non-negative integer.
 </div>
 
-<p>There are following categories: <dfn>CJK digit</dfn>, <dfn>CJK
-ten</dfn>, <dfn>CJK multiple tens</dfn>, <dfn>CJK
-hundred</dfn>, <dfn>CJK multiple hundreds</dfn>, <dfn>CJK
-thousand</dfn>, <dfn>CJK ten thousand</dfn>, <dfn>CJK hundred
-million</dfn>, <dfn>CJK trillion</dfn>, and <dfn>CJK ten
-quadrillion</dfn>.
+<p>There are following categories:
+
+<dfn>CJK digit</dfn>,
+<dfn>CJK zero</dfn>,
+<dfn>CJK non-zero digit</dfn>,
+<dfn>CJK ten</dfn>,
+<dfn>CJK multiple tens</dfn>,
+<dfn>CJK hundred</dfn>,
+<dfn>CJK multiple hundreds</dfn>,
+<dfn>CJK thousand</dfn>,
+<dfn>CJK ten thousand</dfn>,
+<dfn>CJK hundred million</dfn>,
+<dfn>CJK trillion</dfn>,
+<dfn>CJK ten quadrillion</dfn>,
+<dfn>CJK and separator</dfn>,
+<dfn>CJK digit group separator</dfn>,
+and
+<dfn>CJK decimal separator</dfn>.
 
 <table>
   <thead>
     <tr>
       <th colspan=3>Character
       <th rowspan=2>Value
-      <th rowspan=2>Category
+      <th rowspan=2>Categories
     <tr>
       <th>Code point
       <th>Name
@@ -130,6 +144,13 @@ these steps.
 <p>These steps returns either a number or null.  The null value
 represents an error.
 
+  <div class=example>
+
+    <p>Running the steps to <span>parse a CJK number</span>
+    with <code>三十五</code> returns <data>35</data> while running
+    with <code>四万五万</code> returns <code>null</code>.
+
+  </div>
 
 <p>The <dfn>rules for parsing a large CJK number</dfn> are as given in
 the following steps, which share the same <var>input</var> with the
@@ -139,21 +160,31 @@ steps that invoke these steps:
 
 <li>Let <var>value</var> be zero.
 
+<li>Let <var>large digits flag</var> be false.
 
-<li>If <var>input</var> starts with five or more <span title="CJK
-digit">CJK digits</span>, remove them from <var>input</var> and run
-these substeps:
+<li>If <var>input</var> starts with four or more <span title="CJK
+digit">CJK digits</span>, or one or more <span title="CJK digit">CJK
+digits</span> followed by one or more groups of a <span>CJK digit
+group separator</span> followed by three <span title="CJK digit">CJK
+digits</span>:
 
   <ol>
+  
+  <li>Let <var>digits</var> be the found substring.
 
-  <li>Let <var>digits</var> be those characters.
+  <li>Remove them from <var>input</var>.
 
+  <li>Remove any <span>CJK digit group separator</span>
+  from <var>digits</var>.
+  
   <li>Replace each character in <var>digits</var> by
   the <a href="https://html.spec.whatwg.org/#ascii-digits">ASCII
   digit</a> representing its <span>value</span>.
 
   <li>Set <var>v</var> to the value obtained by
   interpreting <var>digits</var> as a decimal number.
+
+  <li>Set <var>large digits flag</var> to true.
 
   </ol>
 
@@ -163,9 +194,33 @@ the <span>rules for parsing a small CJK number</span>.
 <li>If <var>v</var> is null, return null and abort these steps.
 
 
+<li>If <var>input</var> starts with a <span>CJK decimal
+separator</span> followed by one or more <span title="CJK digit">CJK
+digits</span>:
+
+  <ol>
+  
+  <li>Let <var>digits</var> be the found substring.
+
+  <li>Remove them from <var>input</var>.
+
+  <li>Replace the first character from <var>digits</var>
+  by <code>0.</code>.
+  
+  <li>Replace each other character in <var>digits</var> by
+  the <a href="https://html.spec.whatwg.org/#ascii-digits">ASCII
+  digit</a> representing its <span>value</span>.
+
+  <li>Add the value obtained by interpreting <var>digits</var> as a
+  decimal number to <var>v</var>.
+  
+  </ol>
+
+
+
 <li>If <var>input</var> starts with a <span>CJK ten
 quadrillion</span>, remove it from <var>input</var> and run these
-substeps:
+steps:
 
   <ol>
 
@@ -183,7 +238,7 @@ substeps:
 
 
 <li>If <var>input</var> starts with a <span>CJK trillion</span>,
-remove it from <var>input</var> and run these substeps:
+remove it from <var>input</var> and run these steps:
 
   <ol>
 
@@ -201,8 +256,7 @@ remove it from <var>input</var> and run these substeps:
 
 
 <li>If <var>input</var> starts with a <span>CJK hundred
-million</span>, remove it from <var>input</var> and run these
-substeps:
+million</span>, remove it from <var>input</var> and run these steps:
 
   <ol>
 
@@ -219,8 +273,32 @@ substeps:
   </ol>
 
 
-<li>If <var>input</var> starts with a <span>CJK ten thousand</span>,
-remove it from <var>input</var> and run these substeps:
+
+<li>If <var>input</var> starts with a <span>CJK hundred</span>
+followed by a <span>CJK ten thousand</span>:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <span>value</span> of the first
+  character of <var>input</var>.
+
+  <li>Let <var>n</var> be the <span>value</span> of the second
+  character of <var>input</var>.
+
+  <li>Remove first two characters from <var>input</var>.
+
+  <li>Add <var>v</var> &#xd7; <var>m</var> &#xd7; <var>n</var>
+  to <var>value</var>.
+
+  <li>Set <var>v</var> to the result of applying the <span>rules for
+  parsing a small CJK number</span>.
+
+  <li>If <var>v</var> is null, return <var>value</var>.
+
+  </ol>
+  
+<li>Otherwise, if <var>input</var> starts with a <span>CJK ten
+thousand</span>, remove it from <var>input</var> and run these steps:
 
   <ol>
 
@@ -236,6 +314,33 @@ remove it from <var>input</var> and run these substeps:
 
   </ol>
 
+
+<li>If <var>large digits flag</var> is true and <var>input</var>
+starts with a <span>CJK thousand</span> followed by zero, one, two, or
+three <span title="CJK digit">CJK digits</span>:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <span>value</span> of the first
+  character of <var>input</var>.
+
+  <li>Let <var>digits</var> be the found <span title="CJK digit">CJK
+  digits</span>.
+
+  <li>Remove them from <var>input</var>.
+
+  <li>Add <var>v</var> &#xd7; <var>m</var> to <var>value</var>.
+
+  <li>Replace each character in <var>digits</var> by
+  the <a href="https://html.spec.whatwg.org/#ascii-digits">ASCII
+  digit</a> representing its <span>value</span>.
+
+  <li>If <var>digits</var> is the empty string, set <var>v</var> to 0.
+  Otherwise, set <var>v</var> to the value obtained by
+  interpreting <var>digits</var> as a decimal number.
+  
+  </ol>
+  
 
 <li>Add <var>v</var> to <var>value</var>.
 
@@ -249,13 +354,27 @@ steps that invoke these steps:
 
 <ol class=steps>
 
-<li>If <var>input</var> starts with two, three, or
-four <span title="CJK digit">CJK digits</span>, remove them
-from <var>input</var> and run these substeps:
+<li>If <var>input</var> starts with:
+
+  <ul>
+  <li>a <span title="CJK non-zero digit">CJK non-zero digits</span>
+  followed by one, two, or three <span title="CJK digit">CJK digits</span>,
+  <li>a <span>CJK zero</span> followed by two <span title="CJK digit">CJK digits</span>,
+  or
+  <li>a <span>CJK digit</span> followed by a <span>CJK digit group separator</span>
+  followed by three <span title="CJK digit">CJK digits</span>,
+  </ul>
+
+... then:
 
   <ol>
 
-  <li>Let <var>digits</var> be those characters.
+  <li>Let <var>digits</var> be the found substring.
+
+  <li>Remove them from <var>input</var>.
+
+  <li>Remove any <span>CJK digit group separator</span>
+  from <var>digits</var>.
 
   <li>Replace each character in <var>digits</var> by
   the <a href="https://html.spec.whatwg.org/#ascii-digits">ASCII
@@ -268,10 +387,13 @@ from <var>input</var> and run these substeps:
 
 <li>Let <var>value</var> be zero.
 
+<li>Let <var>thousand flag</var> be false.
+
+<li>Let <var>removed flag</var> be false.
 
 <li>If <var>input</var> starts with a <span>CJK digit</span> followed
 by a <span>CJK thousand</span>, remove them from <var>input</var> and
-run these substeps:
+run these steps:
 
   <ol>
 
@@ -283,16 +405,39 @@ run these substeps:
 
   <li>Add <var>n</var> &#xd7; <var>m</var> to <var>value</var>.
 
+  <li>Set <var>thousand flag</var> to true.
+
+  <li>Set <var>removed flag</var> to true.
+
   </ol>
 
 <li>Otherwise, if <var>input</var> starts with a <span>CJK
-thousand</span>, remove it from <var>input</var> and add
-the <span>value</span> of it to <var>value</var>.
+thousand</span>:
+
+  <ol>
+  
+  <li>Remove it from <var>input</var> and add the <span>value</span>
+  of it to <var>value</var>.
+
+  <li>Set <var>thousand flag</var> to true.
+
+  <li>Set <var>removed flag</var> to true.
+
+  </ol>
+
+<li>Otherwise, if <var>input</var> starts with a <span>CJK zero</span>
+followed by a <span>CJK digit</span>:
+
+  <ol>
+
+  <li>Remove the <span>CJK zero</span> from <var>input</var>.
+  
+  </ol>
 
 
 <li>If <var>input</var> starts with a <span>CJK digit</span> followed
 by a <span>CJK hundred</span>, remove them from <var>input</var> and
-run these substeps:
+run these steps:
 
   <ol>
 
@@ -304,17 +449,42 @@ run these substeps:
 
   <li>Add <var>n</var> &#xd7; <var>m</var> to <var>value</var>.
 
+  <li>Set <var>thousand flag</var> to false.
+
+  <li>Set <var>removed flag</var> to true.
+
   </ol>
 
 <li>Otherwise, if <var>input</var> starts with a <span>CJK
-hundred</span> or <span>CJK multiple hundreds</span>, remove it
-from <var>input</var> and add the <span>value</span> of it
-to <var>value</var>.
+hundred</span> or <span>CJK multiple hundreds</span>:
+
+  <ol>
+  
+  <li>Remove it from <var>input</var> and add the <span>value</span>
+  of it to <var>value</var>.
+
+  <li>Set <var>thousand flag</var> to false.
+
+  <li>Set <var>removed flag</var> to true.
+
+  </ol>
+
+<li>Otherwise, if <var>input</var> starts with a <span>CJK zero</span>
+followed by a <span>CJK digit</span>:
+
+  <ol>
+
+  <li>Remove the <span>CJK zero</span> from <var>input</var>.
+
+  <li>Set <var>thousand flag</var> to false.
+  
+  </ol>
+
 
 
 <li>If <var>input</var> starts with a <span>CJK digit</span> followed
 by a <span>CJK ten</span>, remove them from <var>input</var> and run
-these substeps:
+these steps:
 
   <ol>
 
@@ -326,24 +496,77 @@ these substeps:
 
   <li>Add <var>n</var> &#xd7; <var>m</var> to <var>value</var>.
 
+  <li>Set <var>thousand flag</var> to false.
+
+  <li>Set <var>removed flag</var> to true.
+
   </ol>
 
-<li>Otherwise, if <var>input</var> starts with a <span>CJK ten</span>,
-remove it from <var>input</var> and add the <span>value</span> of it
-to <var>value</var>.
+<li>Otherwise, if <var>input</var> starts with a <span>CJK ten</span>
+or <span>CJK multiple tens</span>:
 
-<li>Otherwise, if <var>input</var> starts with a <span>CJK multiple
-tens</span>, remove it from <var>input</var> and add
-the <span>value</span> of it to <var>value</var>.
+  <ol>
+
+  <li>Remove it from <var>input</var> and add the <span>value</span>
+  of it to <var>value</var>.
+
+  <li>Set <var>thousand flag</var> to false.
+
+  <li>Set <var>removed flag</var> to true.
+
+  </ol>
+
+<li>Otherwise, if <var>input</var> starts with a <span>CJK zero</span>
+followed by a <span>CJK digit</span>:
+
+  <ol>
+
+  <li>Remove the <span>CJK zero</span> from <var>input</var>.
+
+  <li>Set <var>thousand flag</var> to false.
+  
+  </ol>
 
 
-<li>If <var>input</var> starts with a <span>CJK digit</span>, remove
-it from <var>input</var> and add the <span>value</span> of it
-to <var>value</var>.
+
+<li>If <var>thousand flag</var> is true and <var>input</var> starts
+with two or three <span title="CJK digit">CJK digits</span>:
+
+  <ol>
+
+  <li>Let <var>digits</var> be them.
+
+  <li>Remove them from <var>input</var>.
+
+  <li>Replace each character in <var>digits</var> by
+  the <a href="https://html.spec.whatwg.org/#ascii-digits">ASCII
+  digit</a> representing its <span>value</span>.
+
+  <li>Add the value obtained by interpreting <var>digits</var> as a
+  decimal number to <var>value</var>.
+
+  <li>Set <var>removed flag</var> to true.
+
+  </ol>
+
+<li>Otherwise, if <var>input</var> starts with a <span>CJK
+digit</span>, or if <var>removed flag</var> is true
+and <var>input</var> starts with a <span>CJK and separator</span>
+followed by a <span>CJK digit</span>:
+
+  <ol>
+
+  <li>Let <var>digit</var> be the <span>CJK digit</span>.
+
+  <li>Remove it from <var>input</var>.
+
+  <li>Add <var>input</var>'s <span>value</span> to <var>value</var>.
+
+  </ol>
 
 
-<li>If no character is removed by these steps, return null and abort
-these steps.
+<li>If <var>removed flag</var> is false, return null and abort these
+steps.
 
 <li>Return <var>value</var>.
 
