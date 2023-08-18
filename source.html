@@ -39,27 +39,42 @@ parsing algorithm.
 <section>
 <h1>Terminology</h1>
 
-<p>All diagrams, examples, and notes in this specification are
-non-normative, as are all sections explicitly marked
-non-normative. Everything else in this specification is normative.
+<p>This specification depends on the
+<a href=https://infra.spec.whatwg.org><cite>Infra Standard</cite></a>.
 
-<p>The key words “<em class=rfc2119>MUST</em>”<!--,
-“<em class=rfc2119>MUST NOT</em>”,
-“<em class=rfc2119>SHOULD</em>”, and “<em class=rfc2119>MAY</em>”
---> in the normative parts of this document are to be interpreted as
-described in <a href=https://tools.ietf.org/html/rfc2119>RFC 2119</a>.
+<p>The terms
 
-<p>Requirements phrased in the imperative as part of algorithms (such
-as “strip any leading space characters” or “return false and abort
-these steps”) are to be interpreted with the meaning of the key word
-(e.g. “<em class=rfc2119>MUST</em>”) used in introducing the
-algorithm.
+<a href=https://infra.spec.whatwg.org/#string><dfn>string</dfn></a>,
+<a href=https://infra.spec.whatwg.org/#string-length><dfn>length</dfn></a>,
+and
+<a href=https://infra.spec.whatwg.org/#string-concatenate><dfn>concatenate</dfn></a>
 
-<p>Conformance requirements phrased as algorithms or specific steps
-<em class=rfc2119>MAY</em> be implemented in any manner, so long as
-the end result is equivalent.  (In particular, the algorithms defined
-in this specification are intended to be easy to follow, and not
-intended to be performant.)
+are defined by the <a href=https://infra.spec.whatwg.org><cite>Infra
+Standard</cite></a>.
+
+<p>The operators
+<dfn>×</dfn>,
+<dfn>/</dfn>,
+and
+<dfn>%</dfn>
+are defined by the
+<a href=https://encoding.spec.whatwg.org/#terminology><cite>Encoding
+Standard</cite></a>.
+
+<p>The term
+
+<a href=https://fetch.spec.whatwg.org/#serialize-an-integer><dfn>serialize an integer</dfn></a>
+
+is defined by the <a href=https://infra.spec.whatwg.org><cite>Fetch
+Standard</cite></a>.
+
+<p>The <dfn>empty string</dfn> is a <span>string</span>
+whose <span>length</span> is zero (0).
+
+<p>To <dfn>append</dfn> a <span>string</span> <var>s</var> to
+a <var>string</var> variable <var>v</var>, set <var>v</var> to
+the <span title=concatenate>concatenation</span> of
+« <var>v</var>, <var>s</var> ».
 
 </section>
 
@@ -122,7 +137,7 @@ and
 <h1>Parsing CJK numbers</h1>
 
 <p>To <dfn>parse a CJK number</dfn> <var>string</var>, the
-implementation <em class=rfc2119>MUST</em> run the following steps:
+implementation <em class=rfc2119>MUST</em> run these steps:
 
 <ol class=steps>
 
@@ -152,9 +167,9 @@ represents an error.
 
   </div>
 
-<p>The <dfn>rules for parsing a large CJK number</dfn> are as given in
-the following steps, which share the same <var>input</var> with the
-steps that invoke these steps:
+<p>The <dfn>rules for parsing a large CJK number</dfn> are these
+steps, which share the same <var>input</var> with the steps that
+invoke these steps:
 
 <ol class=steps>
 
@@ -348,9 +363,9 @@ three <span title="CJK digit">CJK digits</span>:
 
 </ol>
 
-<p>The <dfn>rules for parsing a small CJK number</dfn> are as given in
-the following steps, which share the same <var>input</var> with the
-steps that invoke these steps:
+<p>The <dfn>rules for parsing a small CJK number</dfn> are these
+steps, which share the same <var>input</var> with the steps that
+invoke these steps:
 
 <ol class=steps>
 
@@ -574,6 +589,112 @@ steps.
 
 </section>
 
+<section>
+<h1>Serializing CJK numbers</h1>
+
+<p>To <dfn>serialize a number in CJK-10000-grouped number
+string</dfn>, with an integer <var>number</var>, the
+implementation <em class=rfc2119>MUST</em> run these steps:
+
+<ol class=steps>
+
+<li>Let <var>string</var> be the <span>empty string</span>.
+
+<li>If <var>number</var> is less than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> a U+2212 <code class=charname>MINUS SIGN</code>
+  <span>character</span> (&#x2212;) to <var>string</var>.
+
+  <li>Set <var>number</var> to <var>number</var> <span>×</span> &#x2212;1.
+  
+  </ol>
+
+<li>Let <var>kei</var> be ⌊ <var>number</var> <span>/</span>
+10000000000000000 ⌋.
+
+<li>If <var>kei</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>kei</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>京</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>chou</var> be ⌊ (<var>number</var> <span>%</span>
+10000000000000000) <span>/</span> 1000000000000 ⌋.
+
+<li>If <var>chou</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>chou</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>兆</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>oku</var> be ⌊ (<var>number</var> <span>%</span>
+1000000000000) <span>/</span> 100000000 ⌋.
+
+<li>If <var>oku</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>oku</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>億</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>man</var> be ⌊ (<var>number</var> <span>%</span>
+100000000) <span>/</span> 10000 ⌋.
+
+<li>If <var>man</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>man</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>万</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>one</var> be <var>number</var> <span>%</span> 10000.
+
+<li>If <var>one</var> is greater than zero (0) or <var>string</var> is
+either the <span>empty string</span> or a
+U+2212 <code class=charname>MINUS SIGN</code> <span>character</span>
+(&#x2212;):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>man</var> to <var>string</var>.
+
+  </ol>
+
+<li>Return <var>string</var>.
+                     
+</ol>
+
+<div class=example>
+
+  <p>Running the steps to <span>serialize a number in
+  CJK-10000-grouped number string</span> with <data>1230567</data>
+  returns <code>123万567</code>.
+
+</div>
+
+</section>
+
 </section>
 
 <section>
@@ -581,15 +702,25 @@ steps.
 
 <p><i>This section is non-normative.</i>
 
-<p>There are
+<p>There is
 <a href=https://github.com/manakai/data-chars/blob/master/data/number-values.json>a
 JSON data file</a> on <span title=value>values</span> of characters
-defined in this document and
-<a href=https://github.com/manakai/data-chars/blob/master/data/tests/cjk-numbers.json>a
-JSON test data file</a> for the <span>parse a CJK number</span>
-algorithm
-(<a href="https://github.com/manakai/data-chars/blob/master/doc/number-values.txt">documentation</a>).
+defined in this document.
 
+<p>There are test data:
+
+  <ul>
+
+  <li><a href=https://github.com/manakai/data-chars/blob/master/data/tests/cjk-numbers.json>A
+  JSON test data file</a> for the <span>parse a CJK number</span>
+  algorithm
+  (<a href="https://github.com/manakai/data-chars/blob/master/doc/number-values.txt">documentation</a>).
+
+  <li><a href=https://github.com/manakai/tests-numbers/blob/master/cjk>Test
+  data files</a> for the other algorithms.
+  
+  </ul>
+  
 <p>There is an
 implementation: <a href="https://github.com/wakaba/perl-number-cjk">perl-number-cjk</a>.
 
