@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use utf8;
 use charnames;
+use Math::BigInt;
 
 my $DigitValue = {};
 my $Categories = {};
@@ -100,7 +101,19 @@ for (qw(京)) {
   $DigitValue->{$_} = 1_0000_0000_0000_0000;
   push @{$Categories->{$_}}, 'CJK ten quadrillion';
 }
-for (qw(有)) {
+for (qw(垓)) {
+  $DigitValue->{$_} = Math::BigInt->new ("1_0000_0000_0000_0000_0000");
+  push @{$Categories->{$_}}, 'CJK hundred quintillion';
+}
+for (qw(𥝱 秭)) {
+  $DigitValue->{$_} = Math::BigInt->new ("1_0000_0000_0000_0000_0000_0000");
+  push @{$Categories->{$_}}, 'CJK septillion';
+}
+for (qw(穣 穰)) {
+  $DigitValue->{$_} = Math::BigInt->new ("1_0000_0000_0000_0000_0000_0000_0000");
+  push @{$Categories->{$_}}, 'CJK ten octillion';
+}
+for (qw(有 又)) {
   push @{$Categories->{$_}}, 'CJK and separator';
   $DigitValue->{$_} = 0+"inf";
 }
@@ -125,7 +138,7 @@ sub p ($$$) {
       ord $_[0],
       charnames::viacode (ord $_[0]),
       $_[0],
-      ($_[1] eq 'Inf' ? '-' : sprintf q{<data itemprop=value>%d</data>}, $_[1]),
+      ($_[1] eq 'Inf' ? '-' : sprintf q{<data itemprop=value>%s</data>}, $_[1]),
       join ', ', map {
         sprintf q{<span itemprop=category>%s</span>}, $_
       } @{$_[2]};

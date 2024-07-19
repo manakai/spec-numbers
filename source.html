@@ -25,8 +25,8 @@
 <section id=abstract>
 <h1 class="no-toc no-num">Abstract</h1>
 
-<p>This document defines a CJK number (<span lang=ja>漢数字</span>)
-parsing algorithm.
+<p>This document defines CJK number (<span lang=ja>漢数字</span>)
+parsing and serializing algorithms.
 
 </section>
 
@@ -112,6 +112,9 @@ no <span>value</span>.
 <dfn>CJK hundred million</dfn>,
 <dfn>CJK trillion</dfn>,
 <dfn>CJK ten quadrillion</dfn>,
+<dfn>CJK hundred quintillion</dfn>,
+<dfn>CJK septillion</dfn>,
+<dfn>CJK ten octillion</dfn>,
 <dfn>CJK and separator</dfn>,
 <dfn>CJK digit group separator</dfn>,
 and
@@ -231,6 +234,58 @@ digits</span>:
   
   </ol>
 
+
+<li>If <var>input</var> starts with a <span>CJK ten octillion</span>,
+remove it from <var>input</var> and run these steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <span>value</span> of the removed
+  character.
+
+  <li>Add <var>v</var> &#xd7; <var>m</var> to <var>value</var>.
+
+  <li>Set <var>v</var> to the result of applying the <span>rules for
+  parsing a small CJK number</span>.
+
+  <li>If <var>v</var> is null, return <var>value</var>.
+
+  </ol>
+
+<li>If <var>input</var> starts with a <span>CJK septillion</span>,
+remove it from <var>input</var> and run these steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <span>value</span> of the removed
+  character.
+
+  <li>Add <var>v</var> &#xd7; <var>m</var> to <var>value</var>.
+
+  <li>Set <var>v</var> to the result of applying the <span>rules for
+  parsing a small CJK number</span>.
+
+  <li>If <var>v</var> is null, return <var>value</var>.
+
+  </ol>
+
+<li>If <var>input</var> starts with a <span>CJK hundred
+quintillion</span>, remove it from <var>input</var> and run these
+steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <span>value</span> of the removed
+  character.
+
+  <li>Add <var>v</var> &#xd7; <var>m</var> to <var>value</var>.
+
+  <li>Set <var>v</var> to the result of applying the <span>rules for
+  parsing a small CJK number</span>.
+
+  <li>If <var>v</var> is null, return <var>value</var>.
+
+  </ol>
 
 
 <li>If <var>input</var> starts with a <span>CJK ten
@@ -611,8 +666,51 @@ implementation <em class=rfc2119>MUST</em> run these steps:
   
   </ol>
 
-<li>Let <var>kei</var> be ⌊ <var>number</var> <span>/</span>
-10000000000000000 ⌋.
+<li>Let <var>jou</var> be ⌊ <var>number</var> <span>/</span>
+10000000000000000000000000000 ⌋.
+
+<li>If <var>jou</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>jou</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>穣</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>jo</var> be ⌊ (<var>number</var> <span>%</span>
+10000000000000000000000000000) <span>/</span>
+1000000000000000000000000 ⌋.
+
+<li>If <var>jo</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>jo</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>𥝱</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>gai</var> be ⌊ (<var>number</var> <span>%</span>
+1000000000000000000000000) <span>/</span> 100000000000000000000 ⌋.
+
+<li>If <var>gai</var> is greater than zero (0):
+
+  <ol>
+
+  <li><span>Append</span> the result of <span title="serialize an
+  integer">serializing</span> <var>gai</var> to <var>string</var>.
+
+  <li><span>Append</span> "<code>垓</code>" to <var>string</var>.  
+
+  </ol>
+
+<li>Let <var>kei</var> be ⌊ (<var>number</var> <span>%</span>
+100000000000000000000) <span>/</span> 10000000000000000 ⌋.
 
 <li>If <var>kei</var> is greater than zero (0):
 

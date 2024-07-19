@@ -5,7 +5,7 @@
 </head><body><header>
 <hgroup>
 <h1 class="no-toc no-num">Numbers</h1>
-<h2 class="no-toc no-num">The manakai project, 18 August 2023</h2>
+<h2 class="no-toc no-num">The manakai project, 19 July 2024</h2>
 
 
 <dl>
@@ -23,8 +23,8 @@
 <section id=abstract>
 <h1 class="no-toc no-num" id=abstract-0>Abstract</h1>
 
-<p>This document defines a CJK number (<span lang=ja>漢数字</span>)
-parsing algorithm.
+<p>This document defines CJK number (<span lang=ja>漢数字</span>)
+parsing and serializing algorithms.
 
 </p></section>
 
@@ -121,6 +121,9 @@ no <a href=#value>value</a>.
 <dfn id=cjk-hundred-million>CJK hundred million</dfn>,
 <dfn id=cjk-trillion>CJK trillion</dfn>,
 <dfn id=cjk-ten-quadrillion>CJK ten quadrillion</dfn>,
+<dfn id=cjk-hundred-quintillion>CJK hundred quintillion</dfn>,
+<dfn id=cjk-septillion>CJK septillion</dfn>,
+<dfn id=cjk-ten-octillion>CJK ten octillion</dfn>,
 <dfn id=cjk-and-separator>CJK and separator</dfn>,
 <dfn id=cjk-digit-group-separator>CJK digit group separator</dfn>,
 and
@@ -461,11 +464,25 @@ and
       </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>, <a href=#cjk-non-zero-digit itemprop=category>CJK non-zero digit</a>
   
     </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+53C8</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-53C8</code>
+      </td><td class=char><data>又</data>
+      </td><td class=value>-
+      </td><td><a href=#cjk-and-separator itemprop=category>CJK and separator</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
       <th><code itemprop=codepoint>U+56DB</code>
       </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-56DB</code>
       </td><td class=char><data>四</data>
       </td><td class=value><data itemprop=value>4</data>
       </td><td><a href=#cjk-digit itemprop=category>CJK digit</a>, <a href=#cjk-non-zero-digit itemprop=category>CJK non-zero digit</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+5793</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-5793</code>
+      </td><td class=char><data>垓</data>
+      </td><td class=value><data itemprop=value>100000000000000000000</data>
+      </td><td><a href=#cjk-hundred-quintillion itemprop=category>CJK hundred quintillion</a>
   
     </td></tr><tr itemscope="" itemtype=cjk-numeral>
       <th><code itemprop=codepoint>U+58F1</code>
@@ -578,6 +595,27 @@ and
       </td><td class=char><data>皕</data>
       </td><td class=value><data itemprop=value>200</data>
       </td><td><a href=#cjk-multiple-hundreds itemprop=category>CJK multiple hundreds</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+79ED</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-79ED</code>
+      </td><td class=char><data>秭</data>
+      </td><td class=value><data itemprop=value>1000000000000000000000000</data>
+      </td><td><a href=#cjk-septillion itemprop=category>CJK septillion</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+7A63</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-7A63</code>
+      </td><td class=char><data>穣</data>
+      </td><td class=value><data itemprop=value>10000000000000000000000000000</data>
+      </td><td><a href=#cjk-ten-octillion itemprop=category>CJK ten octillion</a>
+  
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+7A70</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-7A70</code>
+      </td><td class=char><data>穰</data>
+      </td><td class=value><data itemprop=value>10000000000000000000000000000</data>
+      </td><td><a href=#cjk-ten-octillion itemprop=category>CJK ten octillion</a>
   
     </td></tr><tr itemscope="" itemtype=cjk-numeral>
       <th><code itemprop=codepoint>U+8086</code>
@@ -747,6 +785,13 @@ and
       </td><td class=value><data itemprop=value>40</data>
       </td><td><a href=#cjk-multiple-tens itemprop=category>CJK multiple tens</a>
   
+    </td></tr><tr itemscope="" itemtype=cjk-numeral>
+      <th><code itemprop=codepoint>U+25771</code>
+      </th><td><code class=charname>CJK UNIFIED IDEOGRAPH-25771</code>
+      </td><td class=char><data>𥝱</data>
+      </td><td class=value><data itemprop=value>1000000000000000000000000</data>
+      </td><td><a href=#cjk-septillion itemprop=category>CJK septillion</a>
+  
 </td></tr></tbody></table>
 
 </section>
@@ -849,6 +894,58 @@ digits</a>:
   
   </li></ol>
 
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-ten-octillion>CJK ten octillion</a>,
+remove it from <var>input</var> and run these steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-septillion>CJK septillion</a>,
+remove it from <var>input</var> and run these steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
+
+</li><li>If <var>input</var> starts with a <a href=#cjk-hundred-quintillion>CJK hundred
+quintillion</a>, remove it from <var>input</var> and run these
+steps:
+
+  <ol>
+
+  <li>Let <var>m</var> be the <a href=#value>value</a> of the removed
+  character.
+
+  </li><li>Add <var>v</var> × <var>m</var> to <var>value</var>.
+
+  </li><li>Set <var>v</var> to the result of applying the <a href=#rules-for-parsing-a-small-cjk-number>rules for
+  parsing a small CJK number</a>.
+
+  </li><li>If <var>v</var> is null, return <var>value</var>.
+
+  </li></ol>
 
 
 </li><li>If <var>input</var> starts with a <a href=#cjk-ten-quadrillion>CJK ten
@@ -1229,8 +1326,51 @@ implementation <em class=rfc2119>MUST</em> run these steps:
   
   </li></ol>
 
-</li><li>Let <var>kei</var> be ⌊ <var>number</var> <a href=#/>/</a>
-10000000000000000 ⌋.
+</li><li>Let <var>jou</var> be ⌊ <var>number</var> <a href=#/>/</a>
+10000000000000000000000000000 ⌋.
+
+</li><li>If <var>jou</var> is greater than zero (0):
+
+  <ol>
+
+  <li><a href=#append>Append</a> the result of <a href=#serialize-an-integer title="serialize an
+  integer">serializing</a> <var>jou</var> to <var>string</var>.
+
+  </li><li><a href=#append>Append</a> "<code>穣</code>" to <var>string</var>.  
+
+  </li></ol>
+
+</li><li>Let <var>jo</var> be ⌊ (<var>number</var> <a href=#generatedID>%</a>
+10000000000000000000000000000) <a href=#/>/</a>
+1000000000000000000000000 ⌋.
+
+</li><li>If <var>jo</var> is greater than zero (0):
+
+  <ol>
+
+  <li><a href=#append>Append</a> the result of <a href=#serialize-an-integer title="serialize an
+  integer">serializing</a> <var>jo</var> to <var>string</var>.
+
+  </li><li><a href=#append>Append</a> "<code>𥝱</code>" to <var>string</var>.  
+
+  </li></ol>
+
+</li><li>Let <var>gai</var> be ⌊ (<var>number</var> <a href=#generatedID>%</a>
+1000000000000000000000000) <a href=#/>/</a> 100000000000000000000 ⌋.
+
+</li><li>If <var>gai</var> is greater than zero (0):
+
+  <ol>
+
+  <li><a href=#append>Append</a> the result of <a href=#serialize-an-integer title="serialize an
+  integer">serializing</a> <var>gai</var> to <var>string</var>.
+
+  </li><li><a href=#append>Append</a> "<code>垓</code>" to <var>string</var>.  
+
+  </li></ol>
+
+</li><li>Let <var>kei</var> be ⌊ (<var>number</var> <a href=#generatedID>%</a>
+100000000000000000000) <a href=#/>/</a> 10000000000000000 ⌋.
 
 </li><li>If <var>kei</var> is greater than zero (0):
 
